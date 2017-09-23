@@ -1,0 +1,8 @@
+default:
+  adapter: postgresql
+  database: cabify_checkout_rb
+  pool: 5
+  timeout: 5000
+  host: localhost
+  port: 5432
+
