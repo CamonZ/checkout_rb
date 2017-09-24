@@ -7,4 +7,5 @@ gem 'activerecord'
 group :test, :development do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rspec'
+  gem 'shoulda-matchers'
 end
