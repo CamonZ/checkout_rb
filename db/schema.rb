@@ -10,10 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170923194303) do
+ActiveRecord::Schema.define(version: 20170925193123) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "discount_strategies", force: :cascade do |t|
+    t.string "code", null: false
+    t.string "type", null: false
+    t.jsonb "options", default: {}
+    t.index ["code"], name: "index_discount_strategies_on_code", unique: true
+  end
 
   create_table "products", force: :cascade do |t|
     t.string "name", null: false
