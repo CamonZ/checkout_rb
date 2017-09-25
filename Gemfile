@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 
 gem 'pg'
 gem 'activerecord'
+gem 'activesupport'
 
 group :test, :development do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
