@@ -1,24 +1,28 @@
 module DiscountTypes
   class BundledUnitsPricing
-    def process(count, base_price, attrs)
-      base_price * total_units(count, attrs)
+    attr_reader :divisor, :multiplier
+
+    def initialize(attrs)
+      @divisor = attrs[:bundle_divisor]
+      @multiplier = attrs[:bundle_multiplier]
+    end
+
+    def total(base_price, count)
+      base_price * total_units(count)
     end
 
     private
 
-    def total_units(count, attrs)
-      divisor = attrs[:bundle_divisor]
-      multiplier = attrs[:bundle_multiplier]
-
-      bundled_units(count, divisor, multiplier) + remainder_units(count, divisor)
+    def total_units(count)
+      bundled_units(count) + remainder_units(count)
     end
 
-    def bundled_units(count, bundle_divisor, bundle_multiplier)
-      ( count / bundle_divisor ) * bundle_multiplier
+    def bundled_units(count)
+      ( count / divisor ) * multiplier
     end
 
-    def remainder_units(count, bundle_divisor)
-      count % bundle_divisor
+    def remainder_units(count)
+      count % divisor
     end
   end
 end

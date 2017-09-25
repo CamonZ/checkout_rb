@@ -6,7 +6,7 @@ class Checkout
 
   def initialize(pricing_rules)
     @products = {}
-    @rules = pricing_rules
+    @discounts = DiscountProcessor.new(pricing_rules)
   end
 
   def scan(code)
@@ -26,41 +26,13 @@ class Checkout
 
   def product_total(args)
     code, count = args
-    return product_price(code) * count unless codes_with_rules.include?(code)
-    price_with_rules(code, count)
+    base_price = product_price(code)
+
+    return base_price * count unless @discounts.applicable_to?(code)
+    @discounts.price_for(code, base_price, count)
   end
 
   def product_price(code)
     Product.where(code: code).pluck(:price).first
-  end
-
-  def codes_with_rules
-    @rules.map { |rule| rule[:code] }
-  end
-
-  def price_with_rules(code, count)
-    base_price = product_price(code)
-    discount_class(code).new.process(count, base_price, discount_attributes(code))
-  end
-
-  def discount_attributes(code)
-    discount_rule(code)[:attributes]
-  end
-
-  def discount_type(code)
-    discount_rule(code)[:rule]
-  end
-
-  def discount_rule(code)
-    @rules.select { |rule| rule[:code] == code }.first
-  end
-
-  def discount_class(code)
-    begin
-      class_name = ActiveSupport::Inflector.classify(discount_type(code))
-      ActiveSupport::Inflector.constantize("DiscountTypes::#{class_name}")
-    rescue NameError
-      raise Exception.new("Unregistered discount type #{class_name} for product: #{code}")
-    end
   end
 end
