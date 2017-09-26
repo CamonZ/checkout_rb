@@ -17,6 +17,10 @@ class Checkout
     products.sum(&method(:product_total)).to_f
   end
 
+  def clear
+    @products = {}
+  end
+
   private
 
   def rules_mapper(rule, acc)
