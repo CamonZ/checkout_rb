@@ -20,7 +20,7 @@ db_namespace = namespace :db do
   task migrate: [:load_config] do
     ActiveRecord::Base.establish_connection(@config) #establish db connection
     ActiveRecord::Migrator.migrate(@migration_paths)
-    db_namespace["schema:dump"].invoke
+    db_namespace['schema:dump'].invoke
   end
 
   task :reset => [:drop, :create, :migrate]
@@ -29,9 +29,9 @@ db_namespace = namespace :db do
     task :dump do
       require 'active_record/schema_dumper'
 
-      filename = "db/schema.rb"
+      filename = 'db/schema.rb'
 
-      File.open(filename, "w:utf-8") do |file|
+      File.open(filename, 'w:utf-8') do |file|
         ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
       end
     end
@@ -40,7 +40,7 @@ end
 
 namespace :g do
   task :migration do
-    name = ARGV[1] || raise("Specify name: rake g:migration your_migration")
+    name = ARGV[1] || raise('Specify name: rake g:migration your_migration')
 
     path = migration_path(name)
 
@@ -62,7 +62,7 @@ EOF
   end
 
   def timestamp
-    Time.now.strftime("%Y%m%d%H%M%S")
+    Time.now.strftime('%Y%m%d%H%M%S')
   end
 
   def migration_path(name)
@@ -70,6 +70,6 @@ EOF
   end
 
   def migration_class(name)
-    name.split("_").map(&:capitalize).join
+    name.split('_').map(&:capitalize).join
   end
 end

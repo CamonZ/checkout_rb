@@ -1,12 +1,12 @@
 require 'active_support'
-require 'product'
+require_relative 'product'
 
 class Checkout
   attr_reader :products
 
   def initialize(pricing_rules)
     @products = {}
-    @rules = pricing_rules
+    @rules = pricing_rules.each_with_object({}, &method(:rules_mapper))
   end
 
   def scan(code)
@@ -19,6 +19,11 @@ class Checkout
 
   private
 
+  def rules_mapper(rule, acc)
+    code = rule[:code]
+    acc[code] = rule
+  end
+
   def increment_product_count(code)
     @products[code] = 0 unless @products.has_key?(code)
     @products[code] += 1
@@ -26,41 +31,21 @@ class Checkout
 
   def product_total(args)
     code, count = args
-    return product_price(code) * count unless codes_with_rules.include?(code)
-    price_with_rules(code, count)
+    base_price = product_price(code)
+
+    return base_price * count unless discount_applicable_to?(code)
+    discount_strategy(code).price_for(base_price, count)
   end
 
   def product_price(code)
     Product.where(code: code).pluck(:price).first
   end
 
-  def codes_with_rules
-    @rules.map { |rule| rule[:code] }
+  def discount_strategy(code)
+    @rules[code]
   end
 
-  def price_with_rules(code, count)
-    base_price = product_price(code)
-    discount_class(code).new.process(count, base_price, discount_attributes(code))
-  end
-
-  def discount_attributes(code)
-    discount_rule(code)[:attributes]
-  end
-
-  def discount_type(code)
-    discount_rule(code)[:rule]
-  end
-
-  def discount_rule(code)
-    @rules.select { |rule| rule[:code] == code }.first
-  end
-
-  def discount_class(code)
-    begin
-      class_name = ActiveSupport::Inflector.classify(discount_type(code))
-      ActiveSupport::Inflector.constantize("DiscountTypes::#{class_name}")
-    rescue NameError
-      raise Exception.new("Unregistered discount type #{class_name} for product: #{code}")
-    end
+  def discount_applicable_to?(code)
+    @rules.keys.include?(code)
   end
 end
