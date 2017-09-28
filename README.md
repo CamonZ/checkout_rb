@@ -11,7 +11,7 @@ a custom Rakefile with some convenience tasks in order to create / drop the db a
 
 Now, for the good stuff; the solution uses a Strategy Pattern through STI; it leverages ActiveRecord for the heavy lifting of subclassing 
 the appropriate discount strategy that's applicable to each code in the `Checkout` instance. I prefer this approach since it allows further
-extensions in the future by implementing a new strategy, e.g. `TieredBulkPricing`, which would apply a 5% discount over 3 units, 
+extensions in the future by implementing a new strategy, e.g. `TieredBulkPricing`, which could apply a 5% discount over 3 units, 
 a 10% discount over 10 units, and a 15% discount over 50 units.
 
 The implemented strategies are the following:
